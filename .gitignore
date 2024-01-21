@@ -1,3 +1,6 @@
+# Data
+data/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -137,6 +140,9 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# ruff
+.ruff_cache
 
 # mypy
 .mypy_cache/
