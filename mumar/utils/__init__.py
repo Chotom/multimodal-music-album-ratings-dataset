@@ -1,1 +1,1 @@
-"""Module with code utilities for mumar package."""
+"""Package with code utilities for mumar project."""
