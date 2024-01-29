@@ -1,3 +1,4 @@
+"""Module with generic data management mechanism."""
 from typing import Self
 
 import pandas as pd
@@ -5,14 +6,16 @@ from pydantic import RootModel, BaseModel
 
 
 class DataRepository[T: BaseModel]:
-    """
+    """Data management generic class for pydantic.BaseModel types.
+
     The DataRepository class provides a generic data management mechanism for various data models used within a project.
     """
 
     def __init__(self, model: type[T]) -> None:
-        """
+        """Constructor for concrete DataRepository with the same type as model.
+
         Args:
-            model: Entity data model - base type of the repository, determine the data model type.
+            model: Entity data model - base type of the data repository, determine the data model type.
         """
         self.entity = model
         """Pydantic BaseModel class."""
@@ -53,10 +56,14 @@ class DataRepository[T: BaseModel]:
 if __name__ == "__main__":
 
     class AlbumEntity(BaseModel):
+        """Tmp album entity class."""
+
         id: int
         name: str
 
     class SongEntity(BaseModel):
+        """Tmp song entity class."""
+
         id: int
         song_nr: int
 
