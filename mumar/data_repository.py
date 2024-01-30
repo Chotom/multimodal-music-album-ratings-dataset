@@ -1,6 +1,5 @@
 """Module with generic data management mechanism."""
-from typing import Self
-
+import os
 import pandas as pd
 from pydantic import RootModel, BaseModel
 
@@ -8,49 +7,54 @@ from pydantic import RootModel, BaseModel
 class DataRepository[T: BaseModel]:
     """Data management generic class for pydantic.BaseModel types.
 
-    The DataRepository class provides a generic data management mechanism for various data models used within a project.
+    The DataRepository class provides a flexible data management mechanism
+    for various data models used within a project. It serves as a repository
+    for storing, loading, and manipulating models data based on provided Pydantic BaseModel types.
     """
 
-    def __init__(self, model: type[T]) -> None:
+    def __init__(self, model: type[T], filepath: str | None = None) -> None:
         """Constructor for concrete DataRepository with the same type as model.
 
         Args:
             model: Entity data model - base type of the data repository, determine the data model type.
+            filepath: Optional path to the file with data. If provided, data will be read from the file.
         """
         self.entity = model
         """Pydantic BaseModel class."""
 
-        self.data_model = RootModel[dict[int, T]]({})
-        """Container and validator for data."""
+        self.root_model = RootModel[dict[int, model]]
+        """Container and validator class for data."""
 
-        self.data = self.data_model.root
-        """Pointer to the 'root' attribute of a Pydantic RootModel."""
+        init_data = {}
+        if filepath:
+            assert os.path.isfile(filepath), f"File {filepath} does not exist."
+            init_data = self._from_csv(filepath)
 
-    @classmethod
-    def from_csv(cls, model: type[T], filepath: str) -> Self:
-        """Stores data in file in a CSV format.
+        self.data = self.root_model.model_validate(init_data)
+        """Root model instance with data."""
+
+    @staticmethod
+    def _from_csv(filepath: str) -> dict[int, dict]:
+        """Load data from file in a CSV format and return it as a dict.
 
         Args:
-            model: Entity data model - base type of the repository, determine the data model type.
             filepath: Path to the file to store the model data.
 
         Returns:
-            New instance of the DataRepository class with loaded data from a CSV file at the specified filepath.
+            Dict with loaded data where the key is index and the value is serialized model.
         """
-        repo = cls(model)
-        df = pd.read_csv(filepath, sep=",")
-        df.to_dict(orient="index")
-
-        return repo
+        df = pd.read_csv(filepath, sep=",", index_col=0)
+        serialized_data = df.to_dict(orient="index")
+        return serialized_data
 
     def to_csv(self, filepath: str):
-        """Stores data in file in a CSV format.
+        """Stores data to file in a CSV format.
 
         Args:
             filepath: Path to the file to store the model data.
         """
-        df = pd.DataFrame.from_dict(self.data, orient="index")
-        df.to_csv(filepath, sep=",")
+        df = pd.DataFrame.from_dict(self.data.model_dump(), orient="index")
+        df.to_csv(filepath, sep=",", index_label="index")
 
 
 if __name__ == "__main__":
@@ -72,4 +76,5 @@ if __name__ == "__main__":
     s1 = SongEntity(id=1, song_nr=1)
     s2 = SongEntity(id=2, song_nr=2)
 
-    AlbumRepository = DataRepository[AlbumEntity](AlbumEntity)
+    album_repository = DataRepository[AlbumEntity](AlbumEntity)
+    song_repository = DataRepository[SongEntity](SongEntity)
