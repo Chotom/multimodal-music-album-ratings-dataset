@@ -53,7 +53,7 @@ class DataRepository[T: BaseModel]:
 
         return serialized_data
 
-    def to_csv(self, filepath: str) -> None:
+    def to_csv(self, filepath: Path | str) -> None:
         """Stores data to file in a CSV format.
 
         Args:
@@ -61,26 +61,3 @@ class DataRepository[T: BaseModel]:
         """
         loaded_dumped_data = pd.DataFrame.from_dict(self.data.model_dump(), orient="index")
         loaded_dumped_data.to_csv(filepath, sep=",", index_label="index")
-
-
-if __name__ == "__main__":
-
-    class AlbumEntity(BaseModel):
-        """Tmp album entity class."""
-
-        id: int
-        name: str
-
-    class SongEntity(BaseModel):
-        """Tmp song entity class."""
-
-        id: int
-        song_nr: int
-
-    a1 = AlbumEntity(id=1, name="a")
-    a2 = AlbumEntity(id=2, name="b")
-    s1 = SongEntity(id=1, song_nr=1)
-    s2 = SongEntity(id=2, song_nr=2)
-
-    album_repository = DataRepository[AlbumEntity](AlbumEntity)
-    song_repository = DataRepository[SongEntity](SongEntity)

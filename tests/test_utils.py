@@ -8,4 +8,9 @@ def test_config():
 
 def test_logger():
     logger = create_logger("test")
-    assert logger.name == "test"
+    handlers_number = len(logger.handlers)
+    logger2 = create_logger("test")
+
+    assert logger == logger2
+    assert logger2.name == "test"
+    assert len(logger2.handlers) == handlers_number
