@@ -1,7 +1,10 @@
 """Module with generic data management mechanism."""
-import os
+from pathlib import Path
+
 import pandas as pd
-from pydantic import RootModel, BaseModel
+from pydantic import BaseModel, RootModel
+
+from mumar.utils.exceptions import ExactFileNotFoundError
 
 
 class DataRepository[T: BaseModel]:
@@ -12,7 +15,7 @@ class DataRepository[T: BaseModel]:
     for storing, loading, and manipulating models data based on provided Pydantic BaseModel types.
     """
 
-    def __init__(self, model: type[T], filepath: str | None = None) -> None:
+    def __init__(self, model: type[T], filepath: Path | None = None) -> None:
         """Constructor for concrete DataRepository with the same type as model.
 
         Args:
@@ -27,14 +30,16 @@ class DataRepository[T: BaseModel]:
 
         init_data = {}
         if filepath:
-            assert os.path.isfile(filepath), f"File {filepath} does not exist."
-            init_data = self._from_csv(filepath)
+            if filepath.is_file():
+                init_data = self._load_from_csv(filepath)
+            else:
+                raise ExactFileNotFoundError(filepath)
 
         self.data = self.root_model.model_validate(init_data)
         """Root model instance with data."""
 
     @staticmethod
-    def _from_csv(filepath: str) -> dict[int, dict]:
+    def _load_from_csv(filepath: Path | str) -> dict[int, dict]:
         """Load data from file in a CSV format and return it as a dict.
 
         Args:
@@ -43,18 +48,19 @@ class DataRepository[T: BaseModel]:
         Returns:
             Dict with loaded data where the key is index and the value is serialized model.
         """
-        df = pd.read_csv(filepath, sep=",", index_col=0)
-        serialized_data = df.to_dict(orient="index")
+        data_from_file = pd.read_csv(filepath, sep=",", index_col=0)
+        serialized_data = data_from_file.to_dict(orient="index")
+
         return serialized_data
 
-    def to_csv(self, filepath: str):
+    def to_csv(self, filepath: str) -> None:
         """Stores data to file in a CSV format.
 
         Args:
             filepath: Path to the file to store the model data.
         """
-        df = pd.DataFrame.from_dict(self.data.model_dump(), orient="index")
-        df.to_csv(filepath, sep=",", index_label="index")
+        loaded_dumped_data = pd.DataFrame.from_dict(self.data.model_dump(), orient="index")
+        loaded_dumped_data.to_csv(filepath, sep=",", index_label="index")
 
 
 if __name__ == "__main__":

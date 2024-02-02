@@ -1,5 +1,6 @@
 """Module with method to create logger."""
 import logging
+
 from mumar.utils.config import config
 
 
