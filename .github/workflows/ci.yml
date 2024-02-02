@@ -35,7 +35,7 @@ jobs:
         ruff format ./mumar ./tests
 
     - name: Run code quality check (myright)
-      uses: jakebailey/pyright-action@v1
+      uses: jakebailey/pyright-action@v2
       with:
         version: 1.1.139
 
