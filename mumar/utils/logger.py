@@ -1,10 +1,11 @@
+"""Module with method to create logger."""
 import logging
+
 from mumar.utils.config import config
 
 
 def create_logger(logger_name: str) -> logging.Logger:
-    """
-    Create logger with optional azure insight connection if defined.
+    """Create logger with optional azure insight connection if defined.
 
     Args:
         logger_name: Name for the logger e.g. create_logger(__name__).
@@ -12,7 +13,6 @@ def create_logger(logger_name: str) -> logging.Logger:
     Returns:
         Created logger with given name.
     """
-
     log_format = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
     formatter = logging.Formatter(log_format)
 
