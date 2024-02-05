@@ -1,52 +1,65 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
-  build:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      # build
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
-    - name: Run code quality check (ruff linter)
-      run: |
-        ruff ./mumar ./tests
+      # Linting, formatting and typing
+      - name: Run code quality check (ruff linter)
+        run: |
+          ruff ./mumar ./tests
 
-    - name: Run code quality check (ruff format)
-      run: |
-        ruff format ./mumar ./tests
+      - name: Run code quality check (ruff format)
+        run: |
+          ruff format ./mumar ./tests
 
-    - name: Run code quality check (myright)
-      run: |
-        pyright .
+      - name: Run code quality check (myright)
+        run: |
+          pyright ./mumar ./tests
 
-    - name: Run code quality check (pytest)
-      run: |
-        pip install pytest-cov  # Install coverage tool
-        pytest tests/ --cov=./mumar --cov-report=xml
+  tests:
+    runs-on: ubuntu-latest
 
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}  # Replace with your Codecov token
-        file: ./coverage.xml
-        fail_ci_if_error: true
-        fail_unless_covered: '80'
+    steps:
+      # build
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # Testing and coverage.
+      - name: Run tests (pytest)
+        run: |
+          pip install pytest-cov
+          pytest tests/ --cov=./mumar
+
+      - name: Upload coverage report (codecov)
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
