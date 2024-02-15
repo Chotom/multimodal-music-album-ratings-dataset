@@ -1,15 +1,28 @@
 [tool.ruff]
-target-version = "py312"
+target-version = "py38"
 line-length = 120
+exclude = [".venv"]
+indent-width = 4
 
-# Rules list: https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
+# Rules list: https://docs.astral.sh/ruff/rules/
 select = ["ALL"]
 ignore = [
-    "RET504", # For easier debug and better code readability this rules is disabled.
+    "RET504", # For easier debug and better code readability this rule is disabled.
     "ANN101", # The rule has been deprecated since ruff 0.2.0.
-    "ANN101", # The rule has been deprecated since ruff 0.2.0.
+    "ANN102", # The rule has been deprecated since ruff 0.2.0.
+    "TD003", # Link to issue should already assigne author.
+    "COM812", # Conflict with ruff format.
+    "ISC001", # Conflict with ruff format.
+    "E501", # Line too long, handled by ruff format.
 ]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -17,11 +30,9 @@ convention = "google"
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 120
 
-# Ignore rules on test.
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["D", "S101", "ANN201"]
-
-# Pyright
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
+# Ignore rules on tests.
+"tests/**" = [
+    "D", # Exclude docstring checks on tests.
+    "S101", # Allow asserts in tests.
+]

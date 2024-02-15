@@ -1,7 +1,8 @@
 -r requirements.txt
 
-pre-commit==3.6.0
-ruff>=0.2.0
-pyright>=1.1.349
+pre-commit==3.6.1
+ruff==0.2.1
+pyright==1.1.350
 pytest>=7.4.4
 coverage>=7.4.1
+requests_mock>=1.1.0
