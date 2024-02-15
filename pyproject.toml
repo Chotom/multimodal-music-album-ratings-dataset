@@ -11,7 +11,7 @@ ignore = [
     "RET504", # For easier debug and better code readability this rule is disabled.
     "ANN101", # The rule has been deprecated since ruff 0.2.0.
     "ANN102", # The rule has been deprecated since ruff 0.2.0.
-    "TD003", # Link to issue should already assigne author.
+    "TD002", # Link to issue should already assigne author.
     "COM812", # Conflict with ruff format.
     "ISC001", # Conflict with ruff format.
     "E501", # Line too long, handled by ruff format.
